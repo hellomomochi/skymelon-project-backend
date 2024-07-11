@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  //กำหนดให้ id เป็น int รันข้อมูลออโต้เป็นเลข
+  id                       Int       @id @default(autoincrement())
+  //@unique คือข้อมูลแบบไม่ซ้ำกัน
+  username                 String    @unique
+  email                    String    @unique
+  password                 String
+  resetToken               String?   @unique
+  resetTokenExpiration     DateTime?
+  emailVerificationToken   String?   @unique
+  emailVerificationExpires DateTime?
+  checkVerification        Boolean
+  Voter                    Voter[]
+}
+
+model Voter {
+  userid User @relation(fields: [userId], references: [id])
+  userId Int
+
+  classvote String
+  choice    String
+
+  id        Int      @id @default(autoincrement())
+  countvote Int
+  createdAt DateTime @default(now())
+}
+
+model keeptime {
+  id             Int    @id @default(autoincrement())
+  initialSeconds Int
+  startTime      Int
+  endTime        Int
+  branchtime     String
+}
+
+model Homeroom {
+  id            Int             @id @default(autoincrement())
+  code          String          @unique
+  branch        String          @unique
+  image         String
+  Candidateroom Candidateroom[]
+}
+
+model Candidateroom {
+  id              Int       @id @default(autoincrement())
+  candidateName   String
+  imageCandidates String
+  Homeroom        Homeroom? @relation(fields: [homeroomId], references: [id])
+  homeroomId      Int?
+}
